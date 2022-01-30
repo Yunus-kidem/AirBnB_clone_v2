@@ -6,6 +6,8 @@
 from flask import Flask, escape, render_template
 from models import storage
 from models.state import State
+from models.amenity import Amenity
+from models.place import Place
 
 
 app = Flask(__name__)
@@ -15,12 +17,6 @@ app = Flask(__name__)
 def hello():
     '''returns a hello message'''
     return 'Hello HBNB!'
-
-
-@app.route('/hbnb', strict_slashes=False)
-def hbnb():
-    '''returns a hello message'''
-    return 'HBNB'
 
 
 @app.route('/c/<text>', strict_slashes=False)
@@ -57,8 +53,45 @@ def template_odd_even_Route(n):
 @app.route('/states_list', strict_slashes=False)
 def states_list():
     '''lists available states'''
-    states = storage.all(State).values()
+    states = storage.all(State)
     return render_template('7-states_list.html', states=states)
+
+
+@app.route('/cities_by_states', strict_slashes=False)
+def cities_by_states():
+    '''lists available states with there cities'''
+    states = storage.all(State)
+    return render_template('8-cities_by_states.html', states=states)
+
+
+@app.route('/states', strict_slashes=False)
+@app.route('/states/<id>', strict_slashes=False)
+def states_by_id(id=0):
+    '''list states by there id and there cities or just states'''
+    state_id = 'State.' + str(id)
+    states = storage.all(State)
+    return render_template('9-states.html', state_id=state_id, states=states)
+
+
+@app.route('/hbnb_filters', strict_slashes=False)
+def hbnb_filters():
+    '''show states and cities in my airbnb page filters'''
+    states = storage.all(State)
+    amenities = storage.all(Amenity)
+    return render_template('10-hbnb_filters.html',
+                           states=states, amenities=amenities)
+
+
+@app.route('/hbnb', strict_slashes=False)
+def hbnb():
+    '''displaying index-8.html with data from  db'''
+    states = storage.all(State).values()
+    amenities = storage.all(Amenity).values()
+    places = storage.all(Place).values()
+    return render_template('100-hbnb.html',
+                           states=states,
+                           amenities=amenities,
+                           places=places)
 
 
 @app.teardown_appcontext
